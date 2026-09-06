@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>Голосовой ввод</title>
+    <title>Голосовой блокнот (онлайн)</title>
     <style>
-        /* (стили те же, что были, не меняются) */
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
@@ -63,20 +62,18 @@
 </head>
 <body>
 <div class="container">
-    <h1>🎤 Голосовой ввод <small>онлайн / офлайн*</small></h1>
+    <h1>🎤 Голосовой блокнот <small>онлайн</small></h1>
     
     <div class="lang-select">
         <label for="langSelect">Язык распознавания:</label>
         <select id="langSelect">
             <option value="ru-RU">Русский (ru-RU)</option>
-            <option value="ru">Русский (ru)</option>
             <option value="en-US">Английский (en-US)</option>
             <option value="uk-UA">Украинский (uk-UA)</option>
             <option value="de-DE">Немецкий (de-DE)</option>
             <option value="fr-FR">Французский (fr-FR)</option>
             <option value="es-ES">Испанский (es-ES)</option>
         </select>
-        <span style="font-size:14px; color:#94a3b8;">(если русский не поддерживается)</span>
     </div>
 
     <div class="controls">
@@ -90,8 +87,7 @@
         <span id="statusText">Готов к работе</span>
     </div>
     <div class="footnote">
-        * Если включён <code>processLocally = true</code>, браузер попытается распознавать без интернета.
-        В Chrome по умолчанию используется облачный сервер Google.
+        Для распознавания речи требуется подключение к интернету и доступ к микрофону.
     </div>
 </div>
 
@@ -122,8 +118,6 @@
             rec.continuous = true;
             rec.interimResults = true;
             rec.maxAlternatives = 1;
-            // Попытка локальной обработки (экспериментально)
-            rec.processLocally = true;
 
             rec.onresult = function(event) {
                 let interim = '';
@@ -156,15 +150,14 @@
 
             rec.onerror = function(event) {
                 console.warn('Ошибка распознавания:', event.error);
-                // Обработка именно ошибки языка
-                if (event.error === 'language-not-supported') {
-                    statusText.textContent = `❌ Язык "${rec.lang}" не поддерживается. Попробуйте выбрать другой в выпадающем списке.`;
-                } else if (event.error === 'not-allowed') {
+                if (event.error === 'not-allowed') {
                     statusText.textContent = '❌ Доступ к микрофону запрещён';
                 } else if (event.error === 'no-speech') {
                     statusText.textContent = '🔇 Не слышно речи. Попробуйте ещё раз.';
                 } else if (event.error === 'audio-capture') {
                     statusText.textContent = '❌ Не удалось получить доступ к микрофону';
+                } else if (event.error === 'network') {
+                    statusText.textContent = '❌ Проблема с сетью. Проверьте подключение к интернету.';
                 } else {
                     statusText.textContent = `⚠️ Ошибка: ${event.error}`;
                 }
@@ -181,7 +174,6 @@
             if (isListening) return;
             const selectedLang = langSelect.value;
             if (recognition) {
-                // Если уже есть экземпляр, но язык изменился – пересоздадим
                 if (recognition.lang !== selectedLang) {
                     recognition = createRecognition(selectedLang);
                 }
@@ -197,12 +189,8 @@
                 dot.className = 'dot listening';
                 interimDiv.textContent = '';
             } catch (e) {
-                if (e.message && e.message.includes('already started')) {
-                    // игнорируем
-                } else {
-                    console.error(e);
-                    statusText.textContent = '❌ Не удалось запустить распознавание';
-                }
+                console.error(e);
+                statusText.textContent = '❌ Не удалось запустить распознавание';
             }
         }
 
