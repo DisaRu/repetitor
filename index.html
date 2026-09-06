@@ -5,11 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>Голосовой ввод</title>
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+        /* (стили те же, что были, не меняются) */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
             background: #f5f7fa;
@@ -28,129 +25,60 @@
             padding: 32px 24px;
             transition: 0.2s;
         }
-        h1 {
-            font-weight: 600;
-            font-size: 26px;
-            color: #1e293b;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        h1 small {
-            font-size: 14px;
-            font-weight: 400;
-            color: #64748b;
-            margin-left: auto;
-        }
-        .controls {
-            display: flex;
-            gap: 12px;
-            margin: 20px 0 16px;
-            flex-wrap: wrap;
-        }
+        h1 { font-weight: 600; font-size: 26px; color: #1e293b; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        h1 small { font-size: 14px; font-weight: 400; color: #64748b; margin-left: auto; }
+        .controls { display: flex; gap: 12px; margin: 20px 0 16px; flex-wrap: wrap; }
         button {
-            flex: 1 1 auto;
-            padding: 14px 20px;
-            border: none;
-            border-radius: 60px;
-            font-size: 18px;
-            font-weight: 500;
-            background: #eef2f6;
-            color: #1e293b;
-            cursor: pointer;
-            transition: 0.15s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
+            flex: 1 1 auto; padding: 14px 20px; border: none; border-radius: 60px; font-size: 18px; font-weight: 500;
+            background: #eef2f6; color: #1e293b; cursor: pointer; transition: 0.15s;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.02);
         }
         button:active { transform: scale(0.96); }
-        button:disabled {
-            opacity: 0.4;
-            pointer-events: none;
-        }
-        #startBtn {
-            background: #3b82f6;
-            color: white;
-            box-shadow: 0 4px 12px rgba(59,130,246,0.25);
-        }
+        button:disabled { opacity: 0.4; pointer-events: none; }
+        #startBtn { background: #3b82f6; color: white; box-shadow: 0 4px 12px rgba(59,130,246,0.25); }
         #startBtn:active { background: #2563eb; }
-        #stopBtn {
-            background: #ef4444;
-            color: white;
-        }
+        #stopBtn { background: #ef4444; color: white; }
         #stopBtn:active { background: #dc2626; }
         textarea {
-            width: 100%;
-            padding: 16px 18px;
-            font-size: 18px;
-            line-height: 1.6;
-            border: 2px solid #e2e8f0;
-            border-radius: 20px;
-            resize: vertical;
-            min-height: 200px;
-            font-family: inherit;
-            transition: 0.2s;
-            background: #fafcff;
-            color: #0f172a;
+            width: 100%; padding: 16px 18px; font-size: 18px; line-height: 1.6;
+            border: 2px solid #e2e8f0; border-radius: 20px; resize: vertical; min-height: 200px;
+            font-family: inherit; transition: 0.2s; background: #fafcff; color: #0f172a;
         }
-        textarea:focus {
-            border-color: #3b82f6;
-            outline: none;
-            background: white;
-            box-shadow: 0 0 0 4px rgba(59,130,246,0.1);
-        }
-        #interim {
-            margin-top: 8px;
-            font-size: 16px;
-            color: #64748b;
-            min-height: 1.8em;
-            padding: 8px 4px;
-            border-bottom: 2px dashed #e2e8f0;
-        }
-        #status {
-            margin-top: 12px;
-            font-size: 15px;
-            color: #475569;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .dot {
-            display: inline-block;
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: #94a3b8;
-            transition: 0.3s;
-        }
+        textarea:focus { border-color: #3b82f6; outline: none; background: white; box-shadow: 0 0 0 4px rgba(59,130,246,0.1); }
+        #interim { margin-top: 8px; font-size: 16px; color: #64748b; min-height: 1.8em; padding: 8px 4px; border-bottom: 2px dashed #e2e8f0; }
+        #status { margin-top: 12px; font-size: 15px; color: #475569; display: flex; align-items: center; gap: 6px; }
+        .dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #94a3b8; transition: 0.3s; }
         .dot.listening { background: #ef4444; animation: pulse 1.2s infinite; }
         @keyframes pulse {
             0% { transform: scale(1); opacity: 1; }
             50% { transform: scale(1.4); opacity: 0.6; }
             100% { transform: scale(1); opacity: 1; }
         }
-        .footnote {
-            margin-top: 18px;
-            font-size: 14px;
-            color: #94a3b8;
-            border-top: 1px solid #e2e8f0;
-            padding-top: 16px;
-        }
-        @media (max-width: 480px) {
-            .container { padding: 20px 16px; }
-            button { font-size: 16px; padding: 12px 16px; }
-        }
+        .footnote { margin-top: 18px; font-size: 14px; color: #94a3b8; border-top: 1px solid #e2e8f0; padding-top: 16px; }
+        .lang-select { margin: 12px 0; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .lang-select select { padding: 8px 12px; border-radius: 30px; border: 2px solid #e2e8f0; font-size: 16px; background: white; }
+        @media (max-width: 480px) { .container { padding: 20px 16px; } button { font-size: 16px; padding: 12px 16px; } }
     </style>
 </head>
 <body>
 <div class="container">
-    <h1>
-        🎤 Голосовой ввод
-        <small>онлайн / офлайн*</small>
-    </h1>
+    <h1>🎤 Голосовой ввод <small>онлайн / офлайн*</small></h1>
+    
+    <div class="lang-select">
+        <label for="langSelect">Язык распознавания:</label>
+        <select id="langSelect">
+            <option value="ru-RU">Русский (ru-RU)</option>
+            <option value="ru">Русский (ru)</option>
+            <option value="en-US">Английский (en-US)</option>
+            <option value="uk-UA">Украинский (uk-UA)</option>
+            <option value="de-DE">Немецкий (de-DE)</option>
+            <option value="fr-FR">Французский (fr-FR)</option>
+            <option value="es-ES">Испанский (es-ES)</option>
+        </select>
+        <span style="font-size:14px; color:#94a3b8;">(если русский не поддерживается)</span>
+    </div>
+
     <div class="controls">
         <button id="startBtn">🎙 Начать запись</button>
         <button id="stopBtn" disabled>⏹ Остановить</button>
@@ -169,7 +97,6 @@
 
 <script>
     (function() {
-        // Проверка поддержки
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         if (!SpeechRecognition) {
             document.getElementById('statusText').textContent = '❌ Ваш браузер не поддерживает распознавание речи';
@@ -177,29 +104,27 @@
             return;
         }
 
-        // DOM элементы
         const startBtn = document.getElementById('startBtn');
         const stopBtn = document.getElementById('stopBtn');
         const textArea = document.getElementById('textArea');
         const interimDiv = document.getElementById('interim');
         const statusText = document.getElementById('statusText');
         const dot = document.getElementById('dot');
+        const langSelect = document.getElementById('langSelect');
 
         let recognition = null;
         let isListening = false;
-        let finalText = ''; // накопленный финальный текст
+        let finalText = '';
 
-        // Создаём экземпляр
-        function createRecognition() {
+        function createRecognition(lang) {
             const rec = new SpeechRecognition();
-            rec.lang = 'ru-RU';              // язык
-            rec.continuous = true;           // продолжать слушать после пауз
-            rec.interimResults = true;       // показывать промежуточные результаты
+            rec.lang = lang || 'ru-RU';
+            rec.continuous = true;
+            rec.interimResults = true;
             rec.maxAlternatives = 1;
-            // Попытка включить локальную обработку (экспериментально)
-            rec.processLocally = true;        // работает не во всех браузерах
+            // Попытка локальной обработки (экспериментально)
+            rec.processLocally = true;
 
-            // Обработчик результатов
             rec.onresult = function(event) {
                 let interim = '';
                 let final = '';
@@ -211,15 +136,11 @@
                         interim += transcript;
                     }
                 }
-                // Если есть финальный текст – добавляем в текстовое поле
                 if (final) {
-                    // Добавляем к уже накопленному
                     finalText += final;
                     textArea.value = finalText.trimStart();
-                    // Прокручиваем вниз
                     textArea.scrollTop = textArea.scrollHeight;
                 }
-                // Показываем промежуточный текст под полем
                 if (interim) {
                     interimDiv.textContent = '🔊 ' + interim;
                 } else {
@@ -227,19 +148,18 @@
                 }
             };
 
-            // Обработчик окончания (если выключилось само)
             rec.onend = function() {
-                // Если мы не останавливали вручную, и continuous=true, то это может быть ошибкой или тишиной
-                // В любом случае сбрасываем состояние, но не очищаем текст
-                stopListening(false); // false – не очищать finalText
+                stopListening(false);
                 statusText.textContent = 'Распознавание завершено (автоматически)';
                 dot.className = 'dot';
             };
 
-            // Обработчик ошибок
             rec.onerror = function(event) {
                 console.warn('Ошибка распознавания:', event.error);
-                if (event.error === 'not-allowed') {
+                // Обработка именно ошибки языка
+                if (event.error === 'language-not-supported') {
+                    statusText.textContent = `❌ Язык "${rec.lang}" не поддерживается. Попробуйте выбрать другой в выпадающем списке.`;
+                } else if (event.error === 'not-allowed') {
                     statusText.textContent = '❌ Доступ к микрофону запрещён';
                 } else if (event.error === 'no-speech') {
                     statusText.textContent = '🔇 Не слышно речи. Попробуйте ещё раз.';
@@ -250,7 +170,6 @@
                 }
                 dot.className = 'dot';
                 if (isListening) {
-                    // Если была ошибка – останавливаем
                     stopListening(true);
                 }
             };
@@ -258,27 +177,28 @@
             return rec;
         }
 
-        // Функция начала прослушивания
         function startListening() {
             if (isListening) return;
-            if (!recognition) {
-                recognition = createRecognition();
+            const selectedLang = langSelect.value;
+            if (recognition) {
+                // Если уже есть экземпляр, но язык изменился – пересоздадим
+                if (recognition.lang !== selectedLang) {
+                    recognition = createRecognition(selectedLang);
+                }
+            } else {
+                recognition = createRecognition(selectedLang);
             }
             try {
                 recognition.start();
                 isListening = true;
-                // Обновляем UI
                 startBtn.disabled = true;
                 stopBtn.disabled = false;
-                statusText.textContent = '🎧 Слушаю... говорите';
+                statusText.textContent = `🎧 Слушаю (${recognition.lang})...`;
                 dot.className = 'dot listening';
-                // Очищаем промежуточный
                 interimDiv.textContent = '';
-                // Не очищаем finalText – чтобы можно было дописывать
             } catch (e) {
-                // Если уже запущено или другая ошибка
                 if (e.message && e.message.includes('already started')) {
-                    // Игнорируем
+                    // игнорируем
                 } else {
                     console.error(e);
                     statusText.textContent = '❌ Не удалось запустить распознавание';
@@ -286,14 +206,9 @@
             }
         }
 
-        // Функция остановки
         function stopListening(clearFinal = false) {
             if (recognition && isListening) {
-                try {
-                    recognition.stop();
-                } catch (e) {
-                    // Иногда возникает ошибка при остановке уже остановленного
-                }
+                try { recognition.stop(); } catch(e) {}
             }
             isListening = false;
             startBtn.disabled = false;
@@ -304,16 +219,12 @@
                 textArea.value = '';
                 interimDiv.textContent = '';
             }
-            // statusText обновим позже
         }
 
-        // Обработчики на кнопки
         startBtn.addEventListener('click', function() {
-            // Запрашиваем разрешение на микрофон (инициируем поток)
             navigator.mediaDevices.getUserMedia({ audio: true })
                 .then(function(stream) {
-                    // Разрешение получено, можно запускать
-                    stream.getTracks().forEach(track => track.stop()); // останавливаем, т.к. нужно только для разрешения
+                    stream.getTracks().forEach(track => track.stop());
                     startListening();
                 })
                 .catch(function(err) {
@@ -324,22 +235,17 @@
         });
 
         stopBtn.addEventListener('click', function() {
-            stopListening(false); // не очищаем набранный текст
+            stopListening(false);
             statusText.textContent = '⏹ Остановлено пользователем';
         });
 
-        // Если пользователь кликает на текстовое поле – можно вручную редактировать
-        // также можно добавить кнопку очистки, но для простоты оставим так
-
-        // Обработка перезагрузки страницы – остановить распознавание
         window.addEventListener('beforeunload', function() {
             if (recognition && isListening) {
                 try { recognition.abort(); } catch(e) {}
             }
         });
 
-        // При загрузке страницы показываем статус
-        statusText.textContent = 'Готов, нажмите "Начать запись"';
+        statusText.textContent = 'Готов, выберите язык и нажмите "Начать запись"';
     })();
 </script>
 </body>
