@@ -3,81 +3,46 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Голосовой ввод и озвучка</title>
+  <title>Голосовой ассистент на ИИ</title>
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-    }
+    * { box-sizing: border-box; margin: 0; }
     body {
       background: linear-gradient(145deg, #0b0e1a 0%, #1a1f33 100%);
       min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      font-family: 'Segoe UI', system-ui, sans-serif;
       padding: 1rem;
     }
     .card {
-      background: rgba(255, 255, 255, 0.07);
+      background: rgba(255,255,255,0.07);
       backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
       border-radius: 2.5rem;
       padding: 2.5rem 2rem;
-      max-width: 700px;
+      max-width: 800px;
       width: 100%;
-      box-shadow: 0 25px 50px -8px rgba(0, 0, 0, 0.6);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      transition: 0.3s;
+      box-shadow: 0 25px 50px -8px rgba(0,0,0,0.6);
+      border: 1px solid rgba(255,255,255,0.06);
     }
     h1 {
       color: #f0f4ff;
       font-weight: 500;
       font-size: 1.9rem;
-      letter-spacing: -0.02em;
       margin-bottom: 0.25rem;
     }
     .sub {
       color: #8b9bb5;
       font-size: 0.95rem;
-      margin-bottom: 2rem;
+      margin-bottom: 1.5rem;
       border-left: 3px solid #5d7bff;
       padding-left: 0.75rem;
-    }
-    .text-area {
-      background: rgba(0, 0, 0, 0.35);
-      border-radius: 1.5rem;
-      padding: 1.2rem 1.5rem;
-      min-height: 120px;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      margin-bottom: 1.8rem;
-      transition: 0.2s;
-    }
-    .text-area:focus-within {
-      border-color: #5d7bff;
-      box-shadow: 0 0 0 4px rgba(93, 123, 255, 0.15);
-    }
-    #outputText {
-      width: 100%;
-      background: transparent;
-      border: none;
-      outline: none;
-      color: #e8edf5;
-      font-size: 1.2rem;
-      line-height: 1.6;
-      resize: vertical;
-      font-family: inherit;
-      min-height: 80px;
-    }
-    #outputText::placeholder {
-      color: #5a6a82;
-      font-weight: 300;
     }
     .status {
       display: flex;
       align-items: center;
       gap: 0.6rem;
-      margin-bottom: 1.5rem;
+      margin-bottom: 1rem;
       color: #b0c4de;
       font-size: 0.9rem;
     }
@@ -88,9 +53,19 @@
       background: #4a5a7a;
       transition: 0.3s;
     }
-    .dot.listening {
+    .dot.recording {
       background: #ff4d6d;
       box-shadow: 0 0 16px #ff4d6d;
+      animation: pulse 1.2s infinite;
+    }
+    .dot.thinking {
+      background: #fbbf24;
+      box-shadow: 0 0 16px #fbbf24;
+      animation: pulse 1s infinite;
+    }
+    .dot.speaking {
+      background: #34d399;
+      box-shadow: 0 0 16px #34d399;
       animation: pulse 1.2s infinite;
     }
     @keyframes pulse {
@@ -98,340 +73,361 @@
       50% { transform: scale(1.3); opacity: 0.6; }
       100% { transform: scale(1); opacity: 1; }
     }
-    .btn-group {
+    .row {
       display: flex;
       flex-wrap: wrap;
-      gap: 0.8rem;
+      gap: 0.6rem;
+      margin-bottom: 1rem;
     }
     .btn {
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.08);
       color: #d6e0f0;
-      padding: 0.75rem 1.8rem;
+      padding: 0.7rem 1.5rem;
       border-radius: 3rem;
       font-size: 1rem;
-      font-weight: 500;
       cursor: pointer;
       transition: 0.2s;
       display: inline-flex;
       align-items: center;
       gap: 0.5rem;
-      flex: 1 1 auto;
-      justify-content: center;
-      backdrop-filter: blur(4px);
+      flex: 0 1 auto;
     }
-    .btn:hover {
-      background: rgba(255, 255, 255, 0.13);
-      border-color: rgba(255, 255, 255, 0.2);
+    .btn:hover:not(:disabled) {
+      background: rgba(255,255,255,0.13);
+      border-color: rgba(255,255,255,0.2);
       transform: translateY(-2px);
     }
-    .btn:active {
-      transform: scale(0.96);
+    .btn:disabled {
+      opacity: 0.4;
+      pointer-events: none;
     }
     .btn-primary {
       background: #5d7bff;
       border-color: #5d7bff;
       color: #fff;
-      box-shadow: 0 8px 20px -6px #5d7bff55;
     }
-    .btn-primary:hover {
+    .btn-primary:hover:not(:disabled) {
       background: #6f8aff;
       border-color: #6f8aff;
-      box-shadow: 0 12px 28px -8px #5d7bff88;
     }
     .btn-danger {
       background: #d14c6a;
       border-color: #d14c6a;
       color: #fff;
     }
-    .btn-danger:hover {
+    .btn-danger:hover:not(:disabled) {
       background: #e05a7a;
       border-color: #e05a7a;
     }
-    .btn:disabled {
-      opacity: 0.4;
-      pointer-events: none;
-      filter: grayscale(0.6);
+    .btn-success {
+      background: #059669;
+      border-color: #059669;
+      color: #fff;
     }
-    .secondary {
-      background: rgba(255, 255, 255, 0.04);
+    .btn-success:hover:not(:disabled) {
+      background: #10b981;
+      border-color: #10b981;
+    }
+    .text-area {
+      background: rgba(0,0,0,0.35);
+      border-radius: 1.5rem;
+      padding: 1.2rem 1.5rem;
+      border: 1px solid rgba(255,255,255,0.08);
+      margin-bottom: 1rem;
+    }
+    .text-area:focus-within {
+      border-color: #5d7bff;
+      box-shadow: 0 0 0 4px rgba(93,123,255,0.15);
+    }
+    textarea {
+      width: 100%;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #e8edf5;
+      font-size: 1.1rem;
+      line-height: 1.6;
+      resize: vertical;
+      font-family: inherit;
+      min-height: 60px;
+    }
+    textarea::placeholder {
+      color: #5a6a82;
+      font-weight: 300;
+    }
+    .response-box {
+      background: rgba(0,0,0,0.3);
+      border-radius: 1.5rem;
+      padding: 1.2rem 1.5rem;
+      margin-bottom: 1rem;
+      border: 1px solid rgba(255,255,255,0.05);
+      min-height: 80px;
+      color: #e8edf5;
+      font-size: 1.1rem;
+      line-height: 1.6;
+      white-space: pre-wrap;
+    }
+    .response-box .label {
+      color: #8b9bb5;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.3rem;
     }
     .footer-note {
-      margin-top: 1.8rem;
+      margin-top: 1.5rem;
       font-size: 0.8rem;
       color: #4f6180;
       text-align: center;
       border-top: 1px solid rgba(255,255,255,0.04);
-      padding-top: 1.2rem;
-    }
-    .footer-note span {
-      color: #7188b0;
-    }
-    .badge {
-      display: inline-block;
-      background: #2b3550;
-      padding: 0.2rem 0.8rem;
-      border-radius: 20px;
-      font-size: 0.7rem;
-      color: #b8cbff;
+      padding-top: 1rem;
     }
   </style>
 </head>
 <body>
 <div class="card">
-  <h1>🎤 Голосовой блокнот</h1>
-  <div class="sub">Говорите → текст появится ниже → нажмите «Озвучить»</div>
-
-  <div class="text-area">
-    <textarea id="outputText" placeholder="Здесь будет текст, который вы скажете или введёте вручную..." rows="3"></textarea>
-  </div>
+  <h1>🎙️ Голосовой ассистент</h1>
+  <div class="sub">Говорите → распознавание → ответ от ИИ → озвучка</div>
 
   <div class="status">
     <span class="dot" id="statusDot"></span>
-    <span id="statusText">Ожидание</span>
-    <span class="badge" id="langBadge">Русский</span>
+    <span id="statusText">Готов</span>
+    <span class="badge" style="background:#2b3550;padding:0.2rem 0.8rem;border-radius:20px;font-size:0.7rem;color:#b8cbff;">ИИ: Qwen2.5-3B</span>
   </div>
 
-  <div class="btn-group">
-    <button class="btn btn-primary" id="startBtn">🎙️ Начать запись</button>
-    <button class="btn btn-danger" id="stopBtn" disabled>⏹ Остановить</button>
-    <button class="btn secondary" id="speakBtn">🔊 Озвучить текст</button>
-    <button class="btn secondary" id="clearBtn">🗑 Очистить</button>
+  <div class="row">
+    <button class="btn btn-primary" id="recordBtn">🎙️ Записать</button>
+    <button class="btn btn-danger" id="stopBtn" disabled>⏹ Стоп</button>
+    <button class="btn btn-success" id="askBtn" disabled>🤖 Спросить ИИ</button>
+    <button class="btn" id="speakBtn" disabled>🔊 Озвучить ответ</button>
+    <button class="btn" id="clearBtn">🗑 Очистить</button>
+  </div>
+
+  <div class="text-area">
+    <textarea id="outputText" placeholder="Здесь будет распознанный текст или вы можете ввести свой вопрос вручную..." rows="2"></textarea>
+  </div>
+
+  <div class="response-box" id="responseBox">
+    <div class="label">Ответ ИИ:</div>
+    <div id="responseText">Здесь появится ответ ассистента.</div>
   </div>
 
   <div class="footer-note">
-    <span>Работает в Chrome, Edge, Safari.<br>Для микрофона требуется разрешение.</span>
+    <span>Работает через ваш HF Space: <code>lasthomo-voice.hf.space</code></span>
   </div>
 </div>
 
 <script>
   (function() {
-    // --- DOM элементы ---
+    // ===== Конфигурация =====
+    const API_BASE = 'https://lasthomo-voice.hf.space';
+
+    // ===== DOM элементы =====
     const output = document.getElementById('outputText');
-    const startBtn = document.getElementById('startBtn');
-    const stopBtn = document.getElementById('stopBtn');
-    const speakBtn = document.getElementById('speakBtn');
-    const clearBtn = document.getElementById('clearBtn');
+    const responseDiv = document.getElementById('responseText');
     const statusDot = document.getElementById('statusDot');
     const statusText = document.getElementById('statusText');
+    const recordBtn = document.getElementById('recordBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    const askBtn = document.getElementById('askBtn');
+    const speakBtn = document.getElementById('speakBtn');
+    const clearBtn = document.getElementById('clearBtn');
 
-    // --- Проверка поддержки SpeechRecognition ---
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    const synth = window.speechSynthesis;
+    // ===== Состояние =====
+    let isRecording = false;
+    let mediaRecorder = null;
+    let audioChunks = [];
+    let recordedBlob = null;          // последний записанный blob
+    let lastUserText = '';            // последний распознанный или введённый текст
+    let lastAssistantReply = '';      // последний ответ ИИ
 
-    if (!SpeechRecognition) {
-      statusText.textContent = '❌ Ваш браузер не поддерживает распознавание речи. Используйте Chrome/Edge/Safari.';
-      startBtn.disabled = true;
-      return;
-    }
-
-    // --- Создаём экземпляр распознавания ---
-    const recognition = new SpeechRecognition();
-    recognition.lang = 'ru-RU';
-    recognition.continuous = true;        // непрерывное распознавание
-    recognition.interimResults = true;    // показывать промежуточные результаты
-    recognition.maxAlternatives = 1;
-
-    let isListening = false;
-    let finalTranscript = ''; // накопленный финальный текст
-
-    // --- Функция обновления UI статуса ---
-    function setStatus(text, isListeningMode = false) {
+    // ===== Функции статуса =====
+    function setStatus(text, mode) {
       statusText.textContent = text;
-      if (isListeningMode) {
-        statusDot.classList.add('listening');
-      } else {
-        statusDot.classList.remove('listening');
-      }
+      statusDot.className = 'dot';
+      if (mode === 'recording') statusDot.classList.add('recording');
+      else if (mode === 'thinking') statusDot.classList.add('thinking');
+      else if (mode === 'speaking') statusDot.classList.add('speaking');
     }
 
-    // --- Обработчики событий распознавания ---
-
-    recognition.onstart = function() {
-      isListening = true;
-      startBtn.disabled = true;
-      stopBtn.disabled = false;
-      setStatus('🎤 Слушаю...', true);
-    };
-
-    recognition.onerror = function(event) {
-      console.warn('Ошибка распознавания:', event.error);
-      if (event.error === 'not-allowed') {
-        setStatus('❌ Доступ к микрофону запрещён. Разрешите в настройках браузера.');
-      } else if (event.error === 'no-speech') {
-        setStatus('🔇 Речь не обнаружена. Попробуйте снова.', false);
-      } else {
-        setStatus(`⚠️ Ошибка: ${event.error}`, false);
-      }
-      // При ошибке автоматически останавливаем, но не сбрасываем флаг, чтобы можно было перезапустить
-      if (isListening) {
-        stopRecognition();
-      }
-    };
-
-    recognition.onend = function() {
-      // Событие вызывается при остановке (вручную или после ошибки/окончания)
-      if (isListening) {
-        // Если флаг ещё true, значит остановка не по нашей команде — пробуем перезапустить
-        // (чтобы сохранить непрерывность, если прервалось)
-        try {
-          recognition.start();
-        } catch (e) {
-          // если не удалось перезапустить, сбрасываем состояние
-          isListening = false;
-          startBtn.disabled = false;
-          stopBtn.disabled = true;
-          setStatus('⏸ Остановлено (перезапуск не удался)', false);
-        }
-      } else {
-        // Остановлено вручную
-        startBtn.disabled = false;
-        stopBtn.disabled = true;
-        setStatus('⏹ Остановлено', false);
-      }
-    };
-
-    recognition.onresult = function(event) {
-      let interimText = '';
-      let finalText = '';
-
-      for (let i = event.resultIndex; i < event.results.length; i++) {
-        const result = event.results[i];
-        const transcript = result[0].transcript;
-        if (result.isFinal) {
-          finalText += transcript + ' ';
-        } else {
-          interimText += transcript;
-        }
-      }
-
-      // Показываем промежуточный текст в поле (можно добавить, но мы будем выводить финальный + промежуточный)
-      // Лучше показывать финальный накопленный + текущий промежуточный
-      const currentFinal = finalTranscript + finalText;
-      output.value = currentFinal + (interimText ? ' (промежуточно: ' + interimText + ')' : '');
-
-      // Если есть финальный текст, добавляем его в накопленный и очищаем промежуточный
-      if (finalText) {
-        finalTranscript += finalText;
-        // Убираем промежуточный вывод, оставляем только накопленный финал
-        output.value = finalTranscript;
-      }
-    };
-
-    // --- Функции управления ---
-
-    function startRecognition() {
-      if (isListening) return;
+    // ===== Работа с микрофоном и записью =====
+    async function startRecording() {
       try {
-        // Сбрасываем накопленный текст, если хотим начать заново? 
-        // Лучше не сбрасывать, чтобы можно было добавлять, но дадим опцию очистки отдельно.
-        // Но если пользователь нажимает "Начать запись", возможно, он хочет новую запись.
-        // Сделаем так: если в поле есть текст, спросим? Просто очистим по желанию.
-        // Я предлагаю при старте НЕ очищать, чтобы можно было дописывать голосом.
-        recognition.start();
-      } catch (e) {
-        console.warn('Ошибка запуска:', e);
-        // Возможно, уже запущено
-        if (e.message.includes('already started')) {
-          // Пытаемся остановить и запустить заново
-          try {
-            recognition.stop();
-            setTimeout(() => recognition.start(), 200);
-          } catch (err) {
-            alert('Не удалось запустить распознавание. Попробуйте перезагрузить страницу.');
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaRecorder = new MediaRecorder(stream);
+        audioChunks = [];
+
+        mediaRecorder.ondataavailable = (e) => {
+          if (e.data.size > 0) audioChunks.push(e.data);
+        };
+
+        mediaRecorder.onstop = () => {
+          // Создаём blob
+          const blob = new Blob(audioChunks, { type: 'audio/webm' });
+          recordedBlob = blob;
+          isRecording = false;
+          recordBtn.disabled = false;
+          stopBtn.disabled = true;
+          // Если blob не пустой, отправляем на распознавание
+          if (blob.size > 1000) {
+            sendToSTT(blob);
+          } else {
+            setStatus('Речь не обнаружена', '');
           }
+          // Останавливаем все треки
+          stream.getTracks().forEach(t => t.stop());
+        };
+
+        mediaRecorder.start();
+        isRecording = true;
+        recordBtn.disabled = true;
+        stopBtn.disabled = false;
+        askBtn.disabled = true;
+        speakBtn.disabled = true;
+        setStatus('🎤 Запись...', 'recording');
+      } catch (err) {
+        alert('Ошибка доступа к микрофону: ' + err.message);
+        setStatus('❌ Ошибка микрофона', '');
+      }
+    }
+
+    function stopRecording() {
+      if (mediaRecorder && isRecording) {
+        mediaRecorder.stop();
+      }
+    }
+
+    // ===== Отправка на STT =====
+    async function sendToSTT(blob) {
+      setStatus('⏳ Распознавание...', 'thinking');
+      const formData = new FormData();
+      formData.append('file', blob, 'recording.webm');
+
+      try {
+        const response = await fetch(`${API_BASE}/stt`, {
+          method: 'POST',
+          body: formData
+        });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const data = await response.json();
+        const text = data.text || '';
+        if (text.trim()) {
+          output.value = text;
+          lastUserText = text;
+          askBtn.disabled = false;   // разрешаем задать вопрос
+          setStatus('✅ Распознано', '');
+        } else {
+          setStatus('⚠️ Не удалось распознать речь', '');
         }
+      } catch (err) {
+        console.error(err);
+        setStatus('❌ Ошибка STT: ' + err.message, '');
       }
     }
 
-    function stopRecognition() {
-      if (isListening) {
-        try {
-          recognition.stop();
-        } catch (e) {}
-        isListening = false;
-        startBtn.disabled = false;
-        stopBtn.disabled = true;
-        setStatus('⏹ Остановлено', false);
-        // убираем промежуточный текст (оставляем только финал)
-        output.value = finalTranscript;
-      }
-    }
-
-    // --- Озвучивание текста ---
-    function speakText() {
+    // ===== Отправка в /chat =====
+    async function askAI() {
       const text = output.value.trim();
       if (!text) {
+        alert('Введите текст или распознайте речь.');
+        return;
+      }
+      lastUserText = text;
+      askBtn.disabled = true;
+      setStatus('🤖 Думает...', 'thinking');
+
+      try {
+        const payload = {
+          message: text,
+          history: []   // можно при желании хранить историю, но для простоты оставляем пустым
+        };
+        const response = await fetch(`${API_BASE}/chat`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const data = await response.json();
+        const reply = data.response || 'Нет ответа';
+        lastAssistantReply = reply;
+        responseDiv.textContent = reply;
+        speakBtn.disabled = false;
+        setStatus('✅ Ответ получен', '');
+      } catch (err) {
+        console.error(err);
+        setStatus('❌ Ошибка ИИ: ' + err.message, '');
+      } finally {
+        askBtn.disabled = false;
+      }
+    }
+
+    // ===== Озвучивание через SpeechSynthesis (локально) =====
+    function speakReply() {
+      const text = lastAssistantReply || responseDiv.textContent;
+      if (!text || text === 'Здесь появится ответ ассистента.') {
         alert('Нет текста для озвучивания.');
         return;
       }
-      if (!synth) {
+      if (!window.speechSynthesis) {
         alert('Ваш браузер не поддерживает синтез речи.');
         return;
       }
-      // Отменяем текущую речь, если есть
-      if (synth.speaking) {
-        synth.cancel();
+      // Отменяем текущую речь
+      if (window.speechSynthesis.speaking) {
+        window.speechSynthesis.cancel();
       }
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = 'ru-RU';
       utterance.rate = 0.95;
       utterance.pitch = 1.0;
       utterance.volume = 1;
-      // Можно выбрать голос, но оставим системный
-      synth.speak(utterance);
+      utterance.onstart = () => setStatus('🔊 Говорит...', 'speaking');
+      utterance.onend = () => setStatus('✅ Готов', '');
+      utterance.onerror = (e) => {
+        console.warn('SpeechSynthesis error:', e);
+        setStatus('⚠️ Ошибка озвучки', '');
+      };
+      window.speechSynthesis.speak(utterance);
     }
 
-    // --- Очистка ---
-    function clearText() {
-      if (isListening) {
-        // Если слушаем, лучше не очищать накопленное, а то прервем логику.
-        // Можно очистить только если не слушаем.
-        alert('Остановите запись перед очисткой.');
-        return;
-      }
-      finalTranscript = '';
+    // ===== Очистка =====
+    function clearAll() {
       output.value = '';
+      responseDiv.textContent = 'Здесь появится ответ ассистента.';
+      lastUserText = '';
+      lastAssistantReply = '';
+      askBtn.disabled = true;
+      speakBtn.disabled = true;
+      setStatus('Готов', '');
+      if (window.speechSynthesis && window.speechSynthesis.speaking) {
+        window.speechSynthesis.cancel();
+      }
     }
 
-    // --- Обработчики кнопок ---
-    startBtn.addEventListener('click', startRecognition);
+    // ===== Обработчики кнопок =====
+    recordBtn.addEventListener('click', startRecording);
+    stopBtn.addEventListener('click', stopRecording);
+    askBtn.addEventListener('click', askAI);
+    speakBtn.addEventListener('click', speakReply);
+    clearBtn.addEventListener('click', clearAll);
 
-    stopBtn.addEventListener('click', function() {
-      stopRecognition();
-    });
-
-    speakBtn.addEventListener('click', speakText);
-
-    clearBtn.addEventListener('click', clearText);
-
-    // Дополнительно: если пользователь вводит текст вручную, обновляем finalTranscript?
-    // Не будем трогать, потому что голосовое накопление отдельно.
-    // Если пользователь вручную редактирует, то озвучка будет работать с тем, что в поле.
-
-    // При изменении текста вручную мы не синхронизируем finalTranscript,
-    // но это не важно, т.к. при следующем распознавании finalTranscript будет использоваться 
-    // для накопления, и если пользователь что-то вписал, это не пропадёт,
-    // но может произойти дублирование. Поэтому проще: при ручном изменении мы сбрасываем finalTranscript,
-    // чтобы не было конфликтов.
+    // Если пользователь вводит текст вручную, разрешаем кнопку "Спросить ИИ"
     output.addEventListener('input', function() {
-      // Если пользователь редактирует вручную, сбрасываем накопленное, чтобы не мешать
-      if (!isListening) {
-        finalTranscript = output.value;
+      const val = this.value.trim();
+      if (val) {
+        askBtn.disabled = false;
+        lastUserText = val;
       } else {
-        // Если слушаем, лучше не трогать, чтобы не нарушить поток.
+        askBtn.disabled = true;
       }
     });
 
-    // При старте проверяем доступность синтеза
-    if (!synth) {
-      speakBtn.disabled = true;
-      speakBtn.title = 'Синтез речи не поддерживается';
-    }
-
-    // Инициализация состояния
-    setStatus('Готов к записи', false);
+    // Инициализация
+    setStatus('Готов', '');
     stopBtn.disabled = true;
+    askBtn.disabled = true;
+    speakBtn.disabled = true;
   })();
 </script>
 </body>
